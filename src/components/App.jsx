@@ -63,20 +63,12 @@ export class App extends React.Component {
   };
 
   render() {
-    const imagesList = this.state.pictures.map(pic => (
-      <ImageGallery
-        key={pic.id}
-        id={pic.id}
-        webformatURL={pic.webformatURL}
-        largeImageURL={pic.largeImageURL}
-        tags={pic.tags}
-      />
-    ));
+    
     return (
       <>
         <Searchbar onSubmit={this.handleSubmit} />
         {this.state.fetchingImages && <Loader />}
-        {this.state.pictures.length > 0 && <ul>{imagesList}</ul>}
+        {this.state.pictures.length > 0 && <ImageGallery pictures={this.state.pictures}/>}
       </>
     );
   }

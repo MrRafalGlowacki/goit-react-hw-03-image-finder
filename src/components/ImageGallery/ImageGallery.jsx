@@ -1,19 +1,23 @@
 import React from 'react';
+import css from './ImageGallery.module.css';
+import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 
 export class ImageGallery extends React.Component {
   render() {
-    const { id, webformatURL, largeImageURL, tags } = this.props;
+    const imagesList = this.props.pictures.map(pic => (
+        <ImageGalleryItem
+          key={pic.id}
+          id={pic.id}
+          webformatURL={pic.webformatURL}
+          largeImageURL={pic.largeImageURL}
+          tags={pic.tags}
+        />
+      ));
+    
     return (
-      <li key={id} className="gallery-item">
-        <a href={largeImageURL}>
-          <img
-            className="gallery__image"
-            src={webformatURL}
-            alt={tags}
-            loading="lazy"
-          />
-        </a>
-      </li>
+      <ul className={css.gallery}>
+        {imagesList}
+      </ul>
     );
   }
 }
