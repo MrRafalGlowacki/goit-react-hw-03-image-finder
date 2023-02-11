@@ -16,10 +16,9 @@ export class App extends React.Component {
   state = {
     pictures: [],
     fetchingImages: false,
+    actualSearch: '',
   };
-
-  handleSubmit = async (event, value) => {
-    event.preventDefault();
+  handleFetchPictures = async value => {
     const parsedName = value.trim();
     if (parsedName.length === 0) return;
     const url = getUrl(parsedName);
@@ -41,34 +40,56 @@ export class App extends React.Component {
           'Sorry, there are no images matching your search query. Please try again.'
         );
       }
-
       totalHits = data.totalHits;
       if (totalHits === 0) return;
-      // console.log(data.hits);
       const pictures = data.hits.map(picture => ({
         id: picture.id,
         webformatURL: picture.webformatURL,
         largeImageURL: picture.largeImageURL,
         tags: picture.tags,
       }));
-      this.setState(
-        { pictures }
-        // , () => console.log(this.state)
-      );
-      totalPages = Math.ceil(totalHits / amount);
-      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+      const newPictures = [...this.state.pictures, ...pictures];
+      this.setState({ pictures: newPictures });
     } catch (error) {
       console.error(error);
     }
   };
+  handleScrollPage = cardHeight => {
+    window.scrollBy({ top: cardHeight * 3, behavior: 'smooth' });
+  };
+
+  handlePaginationLoader = () => {
+    const { actualSearch } = this.state;
+    if (page < totalPages) {
+      return (page += 1) && this.handleFetchPictures(actualSearch);
+    }
+  };
+
+  handleSubmit = async (event, value) => {
+    event.preventDefault();
+    this.setState({ actualSearch: value, pictures: [] });
+    page = 1;
+    totalHits = 0;
+    await this.handleFetchPictures(value);
+    if (totalHits === 0) return;
+    totalPages = Math.ceil(totalHits / amount);
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+  };
 
   render() {
-    
     return (
       <>
         <Searchbar onSubmit={this.handleSubmit} />
         {this.state.fetchingImages && <Loader />}
-        {this.state.pictures.length > 0 && <ImageGallery pictures={this.state.pictures}/>}
+        {this.state.pictures.length > 0 && (
+          <ImageGallery
+            pictures={this.state.pictures}
+            page={page}
+            totalPages={totalPages}
+            onButtonClick={this.handlePaginationLoader}
+            onScroll={this.handleScrollPage}
+          />
+        )}
       </>
     );
   }
