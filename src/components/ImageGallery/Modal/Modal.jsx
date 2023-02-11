@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import css from './Modal.module.css';
 
 export class Modal extends React.Component {
@@ -25,3 +26,9 @@ export class Modal extends React.Component {
     );
   }
 }
+
+Modal.propTypes = {
+  src: PropTypes.string,
+  tags: PropTypes.string,
+  onClick: PropTypes.func,
+};

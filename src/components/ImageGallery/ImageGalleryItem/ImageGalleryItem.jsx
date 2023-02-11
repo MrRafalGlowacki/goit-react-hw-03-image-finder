@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import css from './ImageGalleryItem.module.css';
 export class ImageGalleryItem extends Component {
   handleModalOpen = () => {
@@ -20,3 +21,10 @@ export class ImageGalleryItem extends Component {
     );
   }
 }
+ImageGalleryItem.propTypes = {
+  id: PropTypes.number,
+  largeImageURL: PropTypes.string,
+  webformatURL: PropTypes.string,
+  onClick: PropTypes.func,
+  tags: PropTypes.string,
+};

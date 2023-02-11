@@ -1,8 +1,10 @@
 import React from 'react';
 import Notiflix from 'notiflix';
+import css from './App.module.css';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import Loader from './ImageGallery/Loader/Loader';
+import { Loader } from './Loader/Loader';
 import { Searchbar } from './Searchbar/Searchbar';
+
 const THEKEY = '31673863-7b4e2329a784886b2ded53b03&';
 const safeSearch = false;
 let totalHits = 0;
@@ -78,7 +80,7 @@ export class App extends React.Component {
 
   render() {
     return (
-      <>
+      <div className={css.app}>
         <Searchbar onSubmit={this.handleSubmit} />
         {this.state.fetchingImages && <Loader />}
         {this.state.pictures.length > 0 && (
@@ -90,7 +92,7 @@ export class App extends React.Component {
             onScroll={this.handleScrollPage}
           />
         )}
-      </>
+      </div>
     );
   }
 }

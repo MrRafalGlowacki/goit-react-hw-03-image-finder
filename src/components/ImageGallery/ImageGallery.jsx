@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button } from './Button/Button';
+import PropTypes from 'prop-types';
 import css from './ImageGallery.module.css';
 import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
+import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
 
 export class ImageGallery extends React.Component {
@@ -12,6 +13,7 @@ export class ImageGallery extends React.Component {
   };
 
   galleryRef = React.createRef();
+
   componentDidUpdate() {
     const cardHeight =
       this.galleryRef.current.firstElementChild.getBoundingClientRect().height;
@@ -60,3 +62,17 @@ export class ImageGallery extends React.Component {
     );
   }
 }
+
+ImageGallery.propTypes = {
+  pictures: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      webformatURL: PropTypes.string,
+      largeImageURL: PropTypes.string,
+    })
+  ),
+  page: PropTypes.number,
+  onScroll: PropTypes.func,
+  totalPages: PropTypes.number,
+  onButtonClick: PropTypes.func,
+};

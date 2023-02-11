@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
 import { BsSearch } from 'react-icons/bs';
 
@@ -15,7 +16,7 @@ export class Searchbar extends React.Component {
     const { onSubmit } = this.props;
     onSubmit(e, this.state.value);
     this.setState({ value: '' });
-     };
+  };
   render() {
     return (
       <header className={css.searchbar}>
@@ -41,3 +42,7 @@ export class Searchbar extends React.Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func,
+};
