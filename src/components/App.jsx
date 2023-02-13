@@ -5,27 +5,29 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Searchbar } from './Searchbar/Searchbar';
 
+const safeSearch = false;
+const amount = 12;
+const THEKEY = '31673863-7b4e2329a784886b2ded53b03&';
+const getUrl = (search, page) =>
+  `https://pixabay.com/api/?key=${THEKEY}&q=${search}&type=photo&orientation=horizontal&safesearch=${safeSearch}&per_page=${amount}&page=${page}`;
+
 export class App extends React.Component {
   state = {
     pictures: [],
     fetchingImages: false,
-    THEKEY: '31673863-7b4e2329a784886b2ded53b03&',
     actualSearch: '',
-    safeSearch: false,
     totalHits: -1,
     page: 1,
-    amount: 12,
     totalPages: -1,
   };
-  getUrl = search =>
-    `https://pixabay.com/api/?key=${this.state.THEKEY}&q=${search}&type=photo&orientation=horizontal&safesearch=${this.state.safeSearch}&per_page=${this.state.amount}&page=${this.state.page}`;
+
   handleFetchPictures = async value => {
     const parsedName = value.trim();
     if (parsedName.length === 0) return;
-    // const url = this.getUrl(parsedName);
+    const url = getUrl(parsedName, this.state.page);
     this.setState({ fetchingImages: true });
     try {
-      const response = await fetch(this.getUrl(parsedName));
+      const response = await fetch(url);
       if (!response.ok) {
         throw (
           (new Error(`Fetch failed with status ${response.status}`),
@@ -44,16 +46,15 @@ export class App extends React.Component {
       this.setState({ totalHits: data.totalHits }, () => {
         console.log('handlefetchpictures', this.state.totalHits);
         if (this.state.totalHits === 0) return;
-        else {
-          const pictures = data.hits.map(picture => ({
-            id: picture.id,
-            webformatURL: picture.webformatURL,
-            largeImageURL: picture.largeImageURL,
-            tags: picture.tags,
-          }));
-          const newPictures = [...this.state.pictures, ...pictures];
-          this.setState({ pictures: newPictures });
-        }
+
+        const pictures = data.hits.map(picture => ({
+          id: picture.id,
+          webformatURL: picture.webformatURL,
+          largeImageURL: picture.largeImageURL,
+          tags: picture.tags,
+        }));
+        const newPictures = [...this.state.pictures, ...pictures];
+        this.setState({ pictures: newPictures });
       });
     } catch (error) {
       console.error(error);
@@ -65,15 +66,19 @@ export class App extends React.Component {
 
   handleSubmit = async (event, value) => {
     event.preventDefault();
-    this.setState({ actualSearch: value, pictures: [], totalHits: 0, page: 1 });
-    console.log('before', this.state.totalHits);
-    await this.handleFetchPictures(value);
-    const { totalHits, amount } = this.state;
-    console.log('after', totalHits);
-    if (totalHits === 0) return;
-    const totalPagesAmount = Math.ceil(totalHits / amount);
-    this.setState({ totalPages: totalPagesAmount });
-    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    this.setState(
+      { actualSearch: value, pictures: [], totalHits: 0, page: 1 },
+      async () => {
+        console.log('before', this.state.totalHits);
+        await this.handleFetchPictures(value);
+        const { totalHits, amount } = this.state;
+        console.log('after', totalHits);
+        if (totalHits === 0) return;
+        const totalPagesAmount = Math.ceil(totalHits / amount);
+        this.setState({ totalPages: totalPagesAmount });
+        Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+      }
+    );
   };
 
   handlePaginationLoader = () => {
