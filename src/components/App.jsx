@@ -44,9 +44,7 @@ export class App extends React.Component {
         );
       }
       this.setState({ totalHits: data.totalHits }, () => {
-        console.log('handlefetchpictures', this.state.totalHits);
         if (this.state.totalHits === 0) return;
-
         const pictures = data.hits.map(picture => ({
           id: picture.id,
           webformatURL: picture.webformatURL,
@@ -56,6 +54,7 @@ export class App extends React.Component {
         const newPictures = [...this.state.pictures, ...pictures];
         this.setState({ pictures: newPictures });
       });
+      return data;
     } catch (error) {
       console.error(error);
     }
@@ -64,19 +63,19 @@ export class App extends React.Component {
     window.scrollBy({ top: cardHeight * 3, behavior: 'smooth' });
   };
 
-  handleSubmit = async (event, value) => {
+  handleSubmit = (event, value) => {
     event.preventDefault();
     this.setState(
       { actualSearch: value, pictures: [], totalHits: 0, page: 1 },
       async () => {
-        console.log('before', this.state.totalHits);
-        await this.handleFetchPictures(value);
-        const { totalHits, amount } = this.state;
-        console.log('after', totalHits);
-        if (totalHits === 0) return;
-        const totalPagesAmount = Math.ceil(totalHits / amount);
-        this.setState({ totalPages: totalPagesAmount });
-        Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+        const data = await this.handleFetchPictures(value);
+        this.setState({ totalHits: data.totalHits }, () => {
+          const { totalHits } = this.state;
+          if (totalHits === 0) return;
+          const totalPagesAmount = Math.ceil(totalHits / amount);
+          this.setState({ totalPages: totalPagesAmount });
+          Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+        });
       }
     );
   };
